@@ -1,0 +1,27 @@
+package cajero;
+
+import java.io.IOException;
+
+/**
+ * La clase Cajero representa un simulador de cajero automático (ATM).
+ * Proporciona una interfaz básica para realizar operaciones bancarias.
+ */
+public class Cajero {
+    /**
+     * Método principal que inicia la aplicación del cajero automático.
+     * @param args Argumentos de línea de comandos (no se utilizan en este caso).
+     * @throws IOException Si ocurre un error de entrada/salida.
+     */
+    public static void main(String[] args) throws IOException {
+        OptionMenu optionMenu = new OptionMenu();
+        introduction();
+        optionMenu.mainMenu();
+    }
+
+    /**
+     * Muestra un mensaje de bienvenida al usuario.
+     */
+    public static void introduction() {
+        System.out.println("¡Bienvenido al Proyecto de Cajero Automático!");
+    }
+}
