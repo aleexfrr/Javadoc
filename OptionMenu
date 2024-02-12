@@ -1,0 +1,265 @@
+package cajero;
+
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.InputMismatchException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Scanner;
+// Clase OptionMenu
+
+/**
+ * La clase OptionMenu representa las opciones de menú disponibles en el sistema
+ * de cajero automático. Proporciona métodos para iniciar sesión, crear cuentas
+ * y acceder a funcionalidades de cuenta.
+ *
+ * @author alex
+ */
+public class OptionMenu {
+
+    Scanner menuInput = new Scanner(System.in);
+    DecimalFormat moneyFormat = new DecimalFormat("'$'###,##0.00");
+    HashMap<Integer, Account> data = new HashMap<Integer, Account>();
+
+    /**
+     * Solicita al usuario que ingrese su número de cliente y PIN para iniciar
+     * sesión.
+     *
+     * @throws IOException si ocurre un error de E/S
+     */
+    public void getLogin() throws IOException {
+        boolean end = false;
+        int customerNumber = 0;
+        int pinNumber = 0;
+        while (!end) {
+            try {
+                System.out.print("\nIngrese su número de cliente: ");
+                customerNumber = menuInput.nextInt();
+                System.out.print("\nIngrese su número PIN: ");
+                pinNumber = menuInput.nextInt();
+                Iterator it = data.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry) it.next();
+                    Account acc = (Account) pair.getValue();
+                    if (data.containsKey(customerNumber) && pinNumber == acc.getPinNumber()) {
+                        getAccountType(acc);
+                        end = true;
+                        break;
+                    }
+                }
+                if (!end) {
+                    System.out.println("\nNúmero de cliente o PIN incorrecto");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("\nCarácter(es) inválido(s). Solo números.");
+            }
+        }
+    }
+
+    /**
+     * Muestra el menú de selección de tipo de cuenta.
+     *
+     * @param acc la cuenta del usuario
+     */
+    public void getAccountType(Account acc) {
+        boolean end = false;
+        while (!end) {
+            try {
+                System.out.println("\nSeleccione la cuenta a la que desea acceder:");
+                System.out.println(" 1 - Cuenta de Cheques");
+                System.out.println(" 2 - Cuenta de Ahorros");
+                System.out.println(" 3 - Salir");
+                System.out.print("\nOpción: ");
+
+                int selection = menuInput.nextInt();
+
+                switch (selection) {
+                    case 1:
+                        getChecking(acc);
+                        break;
+                    case 2:
+                        getSaving(acc);
+                        break;
+                    case 3:
+                        end = true;
+                        break;
+                    default:
+                        System.out.println("\nOpción inválida. Intente nuevamente.");
+                        break;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("\nCarácter(es) inválido(s). Solo números.");
+            }
+        }
+    }
+
+    /**
+     * Muestra el menú de selección de tipo de cuenta para la cuenta de cheques.
+     *
+     * @param acc la cuenta del usuario
+     */
+    public void getChecking(Account acc) {
+        boolean end = false;
+        while (!end) {
+            try {
+                System.out.println("\nCheckings Account: ");
+                System.out.println(" Type 1 - View Balance");
+                System.out.println(" Type 2 - Withdraw Funds");
+                System.out.println(" Type 3 - Deposit Funds");
+                System.out.println(" Type 4 - Transfer Funds");
+                System.out.println(" Type 5 - Exit");
+                System.out.print("\nChoice: ");
+
+                int selection = menuInput.nextInt();
+
+                switch (selection) {
+                    case 1:
+                        System.out.println("\nCheckings Account Balance: " + moneyFormat.format(acc.getCheckingBalance()));
+                        break;
+                    case 2:
+                        acc.getCheckingWithdrawInput();
+                        break;
+                    case 3:
+                        acc.getCheckingDepositInput();
+                        break;
+                    case 4:
+                        acc.getTransferInput("Checkings");
+                        break;
+                    case 5:
+                        end = true;
+                        break;
+                    default:
+                        System.out.println("\nInvalid Choice.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("\nInvalid Choice.");
+                menuInput.next();
+            }
+        }
+    }
+
+    /**
+     * Muestra el menú de selección de tipo de cuenta para la cuenta de ahorros.
+     *
+     * @param acc la cuenta del usuario
+     */
+    public void getSaving(Account acc) {
+        boolean end = false;
+        while (!end) {
+            try {
+                System.out.println("\nSavings Account: ");
+                System.out.println(" Type 1 - View Balance");
+                System.out.println(" Type 2 - Withdraw Funds");
+                System.out.println(" Type 3 - Deposit Funds");
+                System.out.println(" Type 4 - Transfer Funds");
+                System.out.println(" Type 5 - Exit");
+                System.out.print("Choice: ");
+                int selection = menuInput.nextInt();
+                switch (selection) {
+                    case 1:
+                        System.out.println("\nSavings Account Balance: " + moneyFormat.format(acc.getSavingBalance()));
+                        break;
+                    case 2:
+                        acc.getsavingWithdrawInput();
+                        break;
+                    case 3:
+                        acc.getSavingDepositInput();
+                        break;
+                    case 4:
+                        acc.getTransferInput("Savings");
+                        break;
+                    case 5:
+                        end = true;
+                        break;
+                    default:
+                        System.out.println("\nInvalid Choice.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("\nInvalid Choice.");
+                menuInput.next();
+            }
+        }
+    }
+
+    /**
+     * Crea una nueva cuenta de cliente en el sistema de cajero automático.
+     * Solicita al usuario ingresar un número de cliente único y un PIN para la
+     * nueva cuenta.
+     *
+     * @throws IOException si ocurre un error de E/S
+     */
+    public void createAccount() throws IOException {
+        int customerNumber = 0;
+        boolean end = false;
+        while (!end) {
+            try {
+                System.out.println("\nEnter your customer number: ");
+                customerNumber = menuInput.nextInt();
+                Iterator<Map.Entry<Integer, Account>> it = data.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<Integer, Account> pair = it.next();
+                    if (!data.containsKey(customerNumber)) {
+                        end = true;
+                    }
+                }
+                if (!end) {
+                    System.out.println("\nThis customer number is already registered.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("\nInvalid Choice.");
+                menuInput.next(); // Limpiar el búfer de entrada
+            }
+        }
+        System.out.println("\nEnter PIN to be registered: ");
+        int pin = menuInput.nextInt();
+        data.put(customerNumber, new Account(customerNumber, pin));
+        System.out.println("\nYour new account has been successfully registered!");
+        System.out.println("\nRedirecting to login...");
+        getLogin();
+    }
+
+    /**
+     * El menú principal del sistema de cajero automático. Permite al usuario
+     * elegir entre iniciar sesión o crear una cuenta nueva.
+     *
+     * @throws IOException si ocurre un error de E/S
+     */
+    public void mainMenu() throws IOException {
+        // Crear cuentas de ejemplo
+        data.put(952141, new Account(952141, 191904, 1000, 5000));
+        data.put(123, new Account(123, 123, 20000, 50000));
+
+        boolean end = false;
+        while (!end) {
+            try {
+                System.out.println("\nSeleccione una opción:");
+                System.out.println(" 1 - Iniciar sesión");
+                System.out.println(" 2 - Crear una cuenta");
+                System.out.print("\nOpción: ");
+                int choice = menuInput.nextInt();
+
+                switch (choice) {
+                    case 1:
+                        getLogin();
+                        end = true;
+                        break;
+                    case 2:
+                        createAccount();
+                        end = true;
+                        break;
+                    default:
+                        System.out.println("\nOpción inválida.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("\nOpción inválida.");
+                menuInput.next(); // Limpiar el búfer de entrada
+            }
+        }
+
+        System.out.println("\n¡Gracias por usar este cajero automático!\n");
+        menuInput.close();
+        System.exit(0);
+    }
+
+}
